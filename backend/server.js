@@ -1,23 +1,33 @@
 import express from 'express';
-import authRoutes from './routes/auth.routes.js';
 import dotenv from 'dotenv';
-import connectMongoDB from './db/connectMongoDB.js';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
+import { v2 as cloudinary } from 'cloudinary';
+
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+
+import connectMongoDB from './db/connectMongoDB.js';
 
 dotenv.config();
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(helmet()); // Add Helmet to enhance API's security
 app.use(cors()); // Add CORS if needed
-app.use(express.json());
+app.use(express.json()); //to parse req.body
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieParser()); //to pass cookies
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => {
     res.send("Server is ready!");
