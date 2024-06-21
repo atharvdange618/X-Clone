@@ -12,7 +12,7 @@ const NotificationPage = () => {
             _id: "1",
             from: {
                 _id: "1",
-                username: "johndoe",
+                username: "kamleshpc444",
                 profileImg: "/avatars/boy2.png",
             },
             type: "follow",
@@ -21,7 +21,7 @@ const NotificationPage = () => {
             _id: "2",
             from: {
                 _id: "2",
-                username: "janedoe",
+                username: "maithilie._",
                 profileImg: "/avatars/girl1.png",
             },
             type: "like",
