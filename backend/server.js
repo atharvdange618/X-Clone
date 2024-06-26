@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
 import { v2 as cloudinary } from 'cloudinary';
+import bodyParser from 'body-parser'
 
 // Routes
 import authRoutes from './routes/auth.routes.js';
@@ -29,8 +30,8 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 app.use(helmet()); // Add Helmet to enhance API's security
 app.use(cors()); // Add CORS if needed
-app.use(express.json()); //to parse req.body
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser()); //to pass cookies
 
 // Routes
