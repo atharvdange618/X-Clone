@@ -1,66 +1,48 @@
-// Packages
-import express from 'express';
 import path from "path";
-import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
-import cors from 'cors';
-import { v2 as cloudinary } from 'cloudinary';
-import bodyParser from 'body-parser'
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import { v2 as cloudinary } from "cloudinary";
 
-// Routes
-import authRoutes from './routes/auth.routes.js';
-import userRoutes from './routes/user.routes.js';
-import postRoutes from './routes/post.routes.js';
-import notificationRoutes from './routes/notification.routes.js'
+import authRoutes from "./routes/auth.route.js";
+import userRoutes from "./routes/user.route.js";
+import postRoutes from "./routes/post.route.js";
+import notificationRoutes from "./routes/notification.route.js";
 
-// Utils
-import connectMongoDB from './db/connectMongoDB.js';
+import connectMongoDB from "./db/connectMongoDB.js";
 
-// Configs
 dotenv.config();
+
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-// Middlewares
-app.use(helmet()); // Add Helmet to enhance API's security
-app.use(cors()); // Add CORS if needed
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(cookieParser()); //to pass cookies
+app.use(express.json({ limit: "5mb" })); // to parse req.body
+// limit shouldn't be too high to prevent DOS
+app.use(express.urlencoded({ extended: true })); // to parse form data(urlencoded)
 
-// Routes
+app.use(cookieParser());
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "/frontend/dist")));
+	app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-    });
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+	});
 }
 
-// Error handling middleware should be the last middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
-
-// Connect to MongoDB and then start the server
-connectMongoDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}).catch(err => {
-    console.error('Failed to connect to MongoDB', err);
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}`);
+	connectMongoDB();
 });
